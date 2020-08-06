@@ -1,0 +1,93 @@
+﻿<script type="text/x-red" data-template-name="chunks-to-lines">
+	<div class="form-row">
+		<label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="common.label.name"></span></label>
+		<input type="text" id="node-input-name" data-i18n="[placeholder]common.label.name" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-nblines"><i class="fa fa-sign-in"></i> Output <i>n</i> lines at a time</label>
+		<input type="number" id="node-input-nblines" min="1" max="10000" />
+	</div>
+	<div class="form-row">
+		<label for="node-input-decoder"><i class="fa fa-flag"></i> Text decoding<br />(from binary)</label>
+		<select id="node-input-decoder">
+			<!--<option value="auto">Automatic (based on BOM)</option>--><!-- TODO -->
+			<option value="UTF-8">UTF-8</option>
+			<option value="Windows-1252">Windows-1252 (ASCII / ANSI / ISO-8859-1)</option>
+			<option value="UTF-16LE">UTF-16 (UCS-2 LE)</option>
+			<option value="UTF-16BE">UTF-16BE (UCS-2 BE)</option>
+		</select>
+	</div>
+</script>
+
+<script>
+	RED.nodes.registerType('chunks-to-lines', {
+		category: 'sequence',
+		color: '#E2D96E',
+		defaults: {
+			name: {value: ''},
+			nblines: {value: 1},
+			decoder: {value: 'UTF-8'},
+		},
+		inputs: 1,
+		outputs: 1,
+		icon: 'batch.svg',
+		paletteLabel: 'chunks-to-lines',
+		label: function () {
+			return this.name || 'chunks-to-lines';
+		},
+		labelStyle: function () {
+			return this.name ? 'node_label_italic' : '';
+		},
+		oneditprepare: function() {
+		}
+	});
+</script>
+
+<script type="text/x-red" data-help-name="chunks-to-lines">
+	<p>This node takes a stream of chunks of data as input, from which it outputs lines of text in a controlled manner.</p>
+	<p>There is indeed a built-in back-pressure / flow-control mechanism to optimise buffering and avoid memory exhaustion, by waiting for a <i>tick</i> before sending the next message.</p>
+	<p>This node is compatible with the conventions used by core nodes such as <i>split</i> and <i>join</i> to <a href="https://nodered.org/docs/user-guide/messages#message-sequences">work with sequences</a>.
+	<p>For instance, this node can consume data coming from a <a href="https://github.com/alexandrainst/node-red-contrib-ui-upload">node-red-contrib-ui-upload</a> widget.</p>
+
+	<h3>Input</h3>
+	<p>Each received message is expected to be a chunk of a larger document.</p>
+	<p>This node expects messages with a <code>msg.payload</code> containing either a string (when transmitting ASCII/ANSI text) or TypedArray / Uint8Array (when transmitting multi-byte text such as Unicode UTF-8).</p>
+	<p>This node will obey the sequence information provided in <code>msg.parts</code> and <code>msg.complete</code>.</p>
+	<p>Finally, this node also awaits another type of messages containing a truthy <code>msg.tick</code> before releasing the next message.</p>
+
+	<h3>Output</h3>
+	<p>This node will output either one line of text at a time (when n=1 in corresponding option) or an array of lines of text.</p>
+	<p>The messages will contain updated sequence information in <code>msg.parts</code> and <code>msg.complete</code>.</p>
+	<p>For instance, when using the n = 1 option, the output of this node can be attached to a *join* node to recontruct the full document.</p>
+
+	<h3>Options</h3>
+	<dl>
+		<dt>Output <i>n</i> lines at a time</dt>
+		<dd>If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines.</dd>
+		<dd>Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.</dd>
+
+		<dt>Text decoding (from binary)</dt>
+		<dd>When the input is received as text, this parameter has no effect.</dd>
+		<dd>But when the input is received in binary form, this node will have to decode it to text.</dd>
+		<dd>To do that, the encoding of the original text must be specified (UTF-8, Windows-1252, UTF-16…).</dd>
+		<dd>If you do not know, leave it to the default UTF-8.</dd>
+	</dl>
+
+	<h3>Backpressure / flow-control</h3>
+	<p>
+		This node supports <i>backpressure</i> / <i>flow control</i>:
+		it can wait for a *tick* before uploading the next chunk of data, to make sure the rest of your Node-RED flow is ready to process more data
+		(instead of risking an out-of-memory condition), and also conveys this information uptream.
+	</p>
+	<p>This node will only output one message at first, and then await a message containing a truthy <code>msg.tick</code> before releasing the next message.</p>
+	<p>
+		To make this behaviour potentially automatic (avoiding manual wires),
+		this node declares its ability by exposing a truthy <code>node.tickConsumer</code> for downstream nodes to detect this feature,
+		and a truthy <code>node.tickProvider</code> for upstream nodes.
+	</p>
+	<p>
+		Likewise, this node detects upstream nodes using the same back-pressure convention, and automatically sends ticks when its internal buffer is getting low,
+		to ask for the next chunk of data. This is done for instance with the <a href="https://github.com/alexandrainst/node-red-contrib-ui-upload">node-red-contrib-ui-upload</a> widget.
+	</p>
+	<p>As a side node, several instances of this node can be chained to test this mechanism.</p>
+</script>
