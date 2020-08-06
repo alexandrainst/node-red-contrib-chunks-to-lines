@@ -3,7 +3,9 @@
 for instance from a [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload) widget.
 
 This node takes a stream of chunks of data as input, from which it outputs lines of text in a controlled manner.
+
 There is indeed a built-in back-pressure / flow-control mechanism to optimise buffering and avoid memory exhaustion, by waiting for a <i>tick</i> before sending the next message.
+
 This node is compatible with the conventions used by core nodes such as *split* and *join* to [work with sequences](https://nodered.org/docs/user-guide/messages#message-sequences").
 For instance, this node can consume data coming from a [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload).
 
