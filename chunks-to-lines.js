@@ -105,6 +105,7 @@ module.exports = function (RED) {
 					linesInBuffer = 1;
 					upstreamPartsId = '';
 					partsIndex = -1;
+					downstreamReady = true;
 					fifo.push(msg);	//Inform downstream
 				} else {
 					if (msg.parts && msg.parts.id && msg.parts.id !== upstreamPartsId) {
@@ -187,7 +188,6 @@ module.exports = function (RED) {
 			}
 
 			if (downstreamReady) {
-				downstreamReady = false;
 				let response = fifo.shift();
 				if (response) {
 					if (config.nblines > 1) {
@@ -203,9 +203,10 @@ module.exports = function (RED) {
 						}
 						response.payload = payloads;
 					}
+					downstreamReady = false;
 					node.send(response);
 				}
-				if (tickUpstreamNode && fifo.length < linesInBuffer) {
+				if (tickUpstreamNode && ((fifo.length < linesInBuffer) || (fifo.length < 10 * config.nblines))) {
 					//If the FIFO length is low enough, ask upstream to send more data
 					linesInBuffer = 1;
 					tickUpstreamNode.receive({ tick: true });
