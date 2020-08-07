@@ -68,7 +68,8 @@ module.exports = function (RED) {
 		let downstreamReady = true;
 		let stringBuffer = '';
 		let byteBuffer = new Int8Array(0);
-		let linesInBuffer = 1;
+		let nbLinesInChunk = 1;
+		let upstreamTickSent = false;
 		let upstreamPartsId = '';
 		let partsIndex = -1;
 		node.on('input', function (msg) {
@@ -83,6 +84,7 @@ module.exports = function (RED) {
 			if (msg.tick) {
 				downstreamReady = true;
 			} else if (typeof msg.payload === 'string' || ArrayBuffer.isView(msg.payload)) {
+				upstreamTickSent = false;
 				if (msg.parts && msg.parts.abort) {
 					//Upstream abort
 					stringBuffer = '';
@@ -102,7 +104,7 @@ module.exports = function (RED) {
 						fifo.pop();
 					}
 
-					linesInBuffer = 1;
+					nbLinesInChunk = 1;
 					upstreamPartsId = '';
 					partsIndex = -1;
 					downstreamReady = true;
@@ -112,7 +114,6 @@ module.exports = function (RED) {
 						//Prepare system for a new set of upstream parts
 						stringBuffer = '';
 						byteBuffer = new Int8Array(0);
-						linesInBuffer = 1;
 						upstreamPartsId = msg.parts.id || '' + Math.random();
 						partsIndex = -1;
 						downstreamReady = true;
@@ -142,7 +143,7 @@ module.exports = function (RED) {
 						index: partsIndex,
 					};
 
-					let nbNewLines = 0;
+					nbLinesInChunk = 0;
 					while (stringBuffer.length > 0 || byteBuffer.length > 0) {
 						const msg2 = RED.util.cloneMessage(msg);
 
@@ -170,17 +171,15 @@ module.exports = function (RED) {
 							}
 						}
 
-						nbNewLines++;
+						nbLinesInChunk++;
 						msg2.parts.index = ++partsIndex;
 						if (isLastPacket && stringBuffer.length === 0 && byteBuffer.length === 0) {
 							//Last line from upstream
 							msg2.parts.count = partsIndex + 1;
 							msg2.complete = true;
-							linesInBuffer = nbNewLines = 1;
 						}
 						fifo.push(msg2);
 					}
-					linesInBuffer = Math.max(linesInBuffer, nbNewLines);
 				}
 			} else {
 				//Forward unknown type of message
@@ -206,9 +205,9 @@ module.exports = function (RED) {
 					downstreamReady = false;
 					node.send(response);
 				}
-				if (tickUpstreamNode && ((fifo.length < linesInBuffer) || (fifo.length < 10 * config.nblines))) {
+				if (tickUpstreamNode && (!upstreamTickSent) && ((fifo.length < nbLinesInChunk) || (fifo.length < 10 * config.nblines))) {
 					//If the FIFO length is low enough, ask upstream to send more data
-					linesInBuffer = 1;
+					upstreamTickSent = true;
 					tickUpstreamNode.receive({ tick: true });
 				}
 			}
