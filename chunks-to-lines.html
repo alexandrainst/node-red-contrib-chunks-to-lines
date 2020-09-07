@@ -83,7 +83,7 @@
 		<dd>When the input is received as text, this parameter has no effect.</dd>
 		<dd>But when the input is received in binary form, this node will have to decode it to text.</dd>
 		<dd>To do that, the encoding of the original text must be specified (UTF-8, Windows-1252, UTF-16…).</dd>
-		<dd>If you do not know, leave it to the default UTF-8.</dd>
+		<dd>If you do not know, leave it to the default UTF-8. Windows-1252 requires Node.js with <a href="https://nodejs.org/api/util.html#util_whatwg_supported_encodings" rel="external">full ICU</a>.</dd>
 	</dl>
 
 	<h3>Backpressure / flow-control</h3>

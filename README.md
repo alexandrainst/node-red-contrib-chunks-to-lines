@@ -27,7 +27,8 @@ This node will output either one line at a time (when n=1 in corresponding optio
 
 The messages will contain updated sequence information in `msg.parts` and `msg.complete`.
 
-Example for CSV processing (splitting a large CSV file as smaller CSV chunks): [flow-csv.json](doc/flow-csv.json)
+Example for CSV processing (splitting a large CSV file as smaller CSV chunks) for mass insertion into a [PostgreSQL](https://www.npmjs.com/package/node-red-contrib-re-postgres) database,
+inserting many lines at a time to improve performances: [flow-csv.json](doc/flow-csv.json)
 
 ![Node-RED flow](doc/flow-csv.png)
 
@@ -43,7 +44,7 @@ Example for CSV processing (splitting a large CSV file as smaller CSV chunks): [
 * Text decoding (from binary)
 	* When the input is received as text, this parameter has no effect.
 	* But when the input is received in binary form, this node will have to decode it to text.
-	* To do that, the encoding of the original text must be specified (UTF-8, Windows-1252, UTF-16…).
+	* To do that, the encoding of the original text must be specified (UTF-8, Windows-1252, UTF-16…). Windows-1252 requires Node.js with [full ICU](https://nodejs.org/api/util.html#util_whatwg_supported_encodings).
 	* If you do not know, leave it to the default UTF-8.
 
 ## Backpressure
