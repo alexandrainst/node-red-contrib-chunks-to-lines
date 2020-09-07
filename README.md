@@ -34,7 +34,7 @@ inserting many lines at a time to improve performances: [flow-csv.json](doc/flow
 
 ## Options
 * Output <i>n</i> lines at a time:
-	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines (see JSON or text option below).
+	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines (see Text, CSV, or JSON options below).
 	* Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.
 * Output format:
 	* *Text*: plain format, potentially with multiple lines if the above <i>output</i> option is higher than one.
