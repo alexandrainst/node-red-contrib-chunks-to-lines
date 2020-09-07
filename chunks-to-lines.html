@@ -65,9 +65,8 @@
 	<p>Finally, this node also awaits another type of messages containing a truthy <code>msg.tick</code> before releasing the next message.</p>
 
 	<h3>Output</h3>
-	<p>This node will output either one line of text at a time (when n=1 in corresponding option) or an array of lines of text.</p>
+	<p>This node will output either one line at a time (when n=1 in corresponding option) or an array of lines, in a format (text, CSV, JSON) defined in the options.</p>
 	<p>The messages will contain updated sequence information in <code>msg.parts</code> and <code>msg.complete</code>.</p>
-	<p>For instance, when using the n = 1 option, the output of this node can be attached to a *join* node to recontruct the full document.</p>
 
 	<h3>Options</h3>
 	<dl>
@@ -77,7 +76,7 @@
 
 		<dt>Output format</dt>
 		<dd><dfn>Text</dfn>: plain text, potentially with multiple lines if the above <i>output</i> option is higher than one.</dd>
-		<dd><dfn>CSV</dfn>: same as <i>Text</i> mode but with the first line repeated for each output (useful when CSV column names are provided on the first line), and disabling the <code>msg.parts</code> information.</dd>
+		<dd><dfn>CSV</dfn>: same as <i>Text</i> format but with the first line repeated for each output (useful when CSV column names are provided on the first line), and disabling the <code>msg.parts</code> information.</dd>
 		<dd><dfn>JSON array</dfn>: with one line per entry.</dd>
 
 		<dt>Text decoding (from binary)</dt>

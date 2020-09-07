@@ -9,7 +9,7 @@ There is indeed a built-in back-pressure / flow-control mechanism to optimise bu
 This node is compatible with the conventions used by core nodes such as *split* and *join* to [work with sequences](https://nodered.org/docs/user-guide/messages#message-sequences").
 For instance, this node can consume data coming from a [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload).
 
-Example: [flows.json](doc/flows.json)
+Example: [flow.json](doc/flow.json)
 
 ![Node-RED flow](doc/flow.png)
 
@@ -23,18 +23,20 @@ This node will obey the sequence information provided in `msg.parts` and `msg.co
 Finally, this node also awaits another type of messages containing a truthy `msg.tick` before releasing the next message.
 
 ## Output
-This node will output either one line of text at a time (when n=1 in corresponding option) or an array of lines of text.
+This node will output either one line at a time (when n=1 in corresponding option) or an array of lines, in a format (text, CSV, JSON) defined in the options.
 
 The messages will contain updated sequence information in `msg.parts` and `msg.complete`.
 
-For instance, when using the n = 1 option, the output of this node can be attached to a *join* node to reconstruct the full document.
+Example for CSV processing (splitting a large CSV file as smaller CSV chunks): [flow-csv.json](doc/flow-csv.json)
+
+![Node-RED flow](doc/flow-csv.png)
 
 ## Options
 * Output <i>n</i> lines at a time:
 	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines (see JSON or text option below).
 	* Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.
 * Output format:
-	* *Text*: plain text, potentially with multiple lines if the above <i>output</i> option is higher than one.
+	* *Text*: plain format, potentially with multiple lines if the above <i>output</i> option is higher than one.
 	* *CSV*: same as *Text* mode but with the first line repeated for each output (useful when CSV column names are provided on the first line), and disabling the `msg.parts` information.
 	* *JSON array*: with one line per entry.
 
