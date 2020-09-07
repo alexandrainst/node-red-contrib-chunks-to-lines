@@ -1,135 +1,135 @@
 [
-    {
-        "id": "d460fbcd.cff308",
-        "type": "function",
-        "z": "d9a661f4.ef966",
-        "name": "Ready for next lines",
-        "func": "return { tick: true };\n",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 760,
-        "y": 740,
-        "wires": [
-            [
-                "f355c983.6efda"
-            ]
-        ]
-    },
-    {
-        "id": "b3493f5.e16644",
-        "type": "debug",
-        "z": "d9a661f4.ef966",
-        "name": "",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "true",
-        "targetType": "full",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 710,
-        "y": 700,
-        "wires": []
-    },
-    {
-        "id": "6a6813fb.c21544",
-        "type": "ui-upload",
-        "z": "d9a661f4.ef966",
-        "group": "73f7bc6a.978b04",
-        "title": "upload",
-        "name": "",
-        "order": 0,
-        "width": 0,
-        "height": 5,
-        "chunk": "512",
-        "transfer": "text",
-        "x": 80,
-        "y": 740,
-        "wires": [
-            [
-                "f355c983.6efda"
-            ]
-        ]
-    },
-    {
-        "id": "68824cb2.309ddc",
-        "type": "csv",
-        "z": "d9a661f4.ef966",
-        "name": "",
-        "sep": ",",
-        "hdrin": true,
-        "hdrout": "none",
-        "multi": "mult",
-        "ret": "\\n",
-        "temp": "",
-        "skip": "0",
-        "strings": true,
-        "include_empty_strings": false,
-        "include_null_values": "",
-        "x": 390,
-        "y": 740,
-        "wires": [
-            [
-                "2ffbde07.d4b702"
-            ]
-        ]
-    },
-    {
-        "id": "f355c983.6efda",
-        "type": "chunks-to-lines",
-        "z": "d9a661f4.ef966",
-        "name": "",
-        "nbLines": "20",
-        "linesFormat": "csv",
-        "decoder": "Windows-1252",
-        "x": 240,
-        "y": 740,
-        "wires": [
-            [
-                "68824cb2.309ddc"
-            ]
-        ]
-    },
-    {
-        "id": "2ffbde07.d4b702",
-        "type": "function",
-        "z": "d9a661f4.ef966",
-        "name": "DoSomething",
-        "func": "return msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "x": 540,
-        "y": 740,
-        "wires": [
-            [
-                "d460fbcd.cff308",
-                "b3493f5.e16644"
-            ]
-        ]
-    },
-    {
-        "id": "73f7bc6a.978b04",
-        "type": "ui_group",
-        "z": "",
-        "name": "Default",
-        "tab": "d352901b.ae441",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
-    },
-    {
-        "id": "d352901b.ae441",
-        "type": "ui_tab",
-        "z": "",
-        "name": "Home",
-        "icon": "dashboard",
-        "disabled": false,
-        "hidden": false
-    }
+	{
+		"id": "d460fbcd.cff308",
+		"type": "function",
+		"z": "d9a661f4.ef966",
+		"name": "Ready for next lines",
+		"func": "return { tick: true };\n",
+		"outputs": 1,
+		"noerr": 0,
+		"initialize": "",
+		"finalize": "",
+		"x": 760,
+		"y": 740,
+		"wires": [
+			[
+				"f355c983.6efda"
+			]
+		]
+	},
+	{
+		"id": "b3493f5.e16644",
+		"type": "debug",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "true",
+		"targetType": "full",
+		"statusVal": "",
+		"statusType": "auto",
+		"x": 710,
+		"y": 700,
+		"wires": []
+	},
+	{
+		"id": "6a6813fb.c21544",
+		"type": "ui-upload",
+		"z": "d9a661f4.ef966",
+		"group": "73f7bc6a.978b04",
+		"title": "upload",
+		"name": "",
+		"order": 0,
+		"width": 0,
+		"height": 5,
+		"chunk": "512",
+		"transfer": "text",
+		"x": 80,
+		"y": 740,
+		"wires": [
+			[
+				"f355c983.6efda"
+			]
+		]
+	},
+	{
+		"id": "68824cb2.309ddc",
+		"type": "csv",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"sep": ",",
+		"hdrin": true,
+		"hdrout": "none",
+		"multi": "mult",
+		"ret": "\\n",
+		"temp": "",
+		"skip": "0",
+		"strings": true,
+		"include_empty_strings": false,
+		"include_null_values": "",
+		"x": 390,
+		"y": 740,
+		"wires": [
+			[
+				"2ffbde07.d4b702"
+			]
+		]
+	},
+	{
+		"id": "f355c983.6efda",
+		"type": "chunks-to-lines",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"nbLines": "20",
+		"linesFormat": "csv",
+		"decoder": "Windows-1252",
+		"x": 240,
+		"y": 740,
+		"wires": [
+			[
+				"68824cb2.309ddc"
+			]
+		]
+	},
+	{
+		"id": "2ffbde07.d4b702",
+		"type": "function",
+		"z": "d9a661f4.ef966",
+		"name": "DoSomething",
+		"func": "return msg;",
+		"outputs": 1,
+		"noerr": 0,
+		"initialize": "",
+		"finalize": "",
+		"x": 540,
+		"y": 740,
+		"wires": [
+			[
+				"d460fbcd.cff308",
+				"b3493f5.e16644"
+			]
+		]
+	},
+	{
+		"id": "73f7bc6a.978b04",
+		"type": "ui_group",
+		"z": "",
+		"name": "Default",
+		"tab": "d352901b.ae441",
+		"order": 1,
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "d352901b.ae441",
+		"type": "ui_tab",
+		"z": "",
+		"name": "Home",
+		"icon": "dashboard",
+		"disabled": false,
+		"hidden": false
+	}
 ]

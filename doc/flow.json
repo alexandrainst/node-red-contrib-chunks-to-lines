@@ -10,7 +10,7 @@
 		"width": 0,
 		"height": 5,
 		"chunk": "1024",
-		"transfer": "binary",
+		"transfer": "text",
 		"x": 190,
 		"y": 220,
 		"wires": [
@@ -25,7 +25,7 @@
 		"z": "64eedace.95536c",
 		"name": "",
 		"nblines": "1",
-		"decoder": "UTF-8",
+		"decoder": "Windows-1252",
 		"x": 380,
 		"y": 220,
 		"wires": [
