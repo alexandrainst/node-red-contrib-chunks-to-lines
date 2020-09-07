@@ -8,6 +8,7 @@
 		"text",
 		"reader",
 		"lines",
+		"CSV",
 		"Unicode",
 		"node-red",
 		"node-red-contrib",

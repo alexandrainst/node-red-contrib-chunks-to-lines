@@ -27,14 +27,17 @@ This node will output either one line of text at a time (when n=1 in correspondi
 
 The messages will contain updated sequence information in `msg.parts` and `msg.complete`.
 
-For instance, when using the n = 1 option, the output of this node can be attached to a *join* node to recontruct the full document.
+For instance, when using the n = 1 option, the output of this node can be attached to a *join* node to reconstruct the full document.
 
 ## Options
 * Output <i>n</i> lines at a time:
-	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines.
+	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines (see JSON or text option below).
 	* Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.
-* Output format for multiple lines:
-	* If the the above *output* option is higher than one, then choose between providing the lines as a JSON array, or text with multiple lines
+* Output format:
+	* *Text*: plain text, potentially with multiple lines if the above <i>output</i> option is higher than one.
+	* *CSV*: same as *Text* mode but with the first line repeated for each output (useful when CSV column names are provided on the first line), and disabling the `msg.parts` information.
+	* *JSON array*: with one line per entry.
+
 * Text decoding (from binary)
 	* When the input is received as text, this parameter has no effect.
 	* But when the input is received in binary form, this node will have to decode it to text.
@@ -44,7 +47,7 @@ For instance, when using the n = 1 option, the output of this node can be attach
 ## Backpressure
 This node supports *backpressure* / *flow control*:
 it can wait for a *tick* before uploading the next chunk of data, to make sure the rest of your Node-RED flow is ready to process more data
-(instead of risking an out-of-memory condition), and also conveys this information uptream.
+(instead of risking an out-of-memory condition), and also conveys this information upstream.
 
 So this node will only output one message at first, and then await a message containing a truthy `msg.tick` before releasing the next message.
 

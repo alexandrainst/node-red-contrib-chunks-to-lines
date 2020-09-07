@@ -73,6 +73,7 @@ module.exports = function (RED) {
 		let upstreamPartsId = '';
 		let partsIndex = -1;
 		let partsIndexMultiline = -1;
+		let csvFirstLine = '';
 		node.on('input', function (msg) {
 			if (tickDownstreamId === undefined) {
 				tickDownstreamId = findOutputNodeId(node, n => RED.nodes.getNode(n.id).tickProvider);
@@ -109,6 +110,7 @@ module.exports = function (RED) {
 					upstreamPartsId = '';
 					partsIndex = -1;
 					partsIndexMultiline = -1;
+					csvFirstLine = '';
 					downstreamReady = true;
 					fifo.push(msg);	//Inform downstream
 				} else {
@@ -119,6 +121,7 @@ module.exports = function (RED) {
 						upstreamPartsId = msg.parts.id || '' + Math.random();
 						partsIndex = -1;
 						partsIndexMultiline = -1;
+						csvFirstLine = '';
 						downstreamReady = true;
 					}
 
@@ -177,6 +180,10 @@ module.exports = function (RED) {
 
 						nbLinesInChunk++;
 						msg2.parts.index = ++partsIndex;
+						if (partsIndex === 0) {
+							//First line from upstream
+							csvFirstLine = msg2.payload;
+						}
 						if (isLastPacket && stringBuffer.length === 0 && byteBuffer.length === 0) {
 							//Last line from upstream
 							msg2.parts.count = partsIndex + 1;
@@ -193,43 +200,45 @@ module.exports = function (RED) {
 			if (downstreamReady) {
 				let response = fifo.shift();
 				if (response) {
-					if (config.nblines > 1) {
-						const partsIndex = response.parts.index;
-						if (config.linesFormat === 'json') {
-							const payloads = [ response.payload ];
-							for (let i = config.nblines - 2; i >= 0; i--) {
-								const next = fifo.shift();
-								if (next) {
-									response = next;
-									payloads.push(next.payload);
-								} else {
-									break;
-								}
+					if (config.linesFormat === 'json') {
+						const payloads = [ response.payload ];
+						for (let i = config.nbLines - 2; i >= 0; i--) {
+							const next = fifo.shift();
+							if (next) {
+								response = next;
+								payloads.push(next.payload);
+							} else {
+								break;
 							}
-							response.payload = payloads;
-						} else {	// 'text'
-							let payload = response.payload;
-							for (let i = config.nblines - 2; i >= 0; i--) {
-								const next = fifo.shift();
-								if (next) {
-									response = next;
-									payload += next.payload;
-								} else {
-									break;
-								}
-							}
-							response.payload = payload;
 						}
-						response.parts.index = partsIndex;
+						response.payload = payloads;
+					} else {	// 'text' or 'csv'
+						let payload = response.payload;
+						for (let i = config.nbLines - 2; i >= 0; i--) {
+							const next = fifo.shift();
+							if (next) {
+								response = next;
+								payload += next.payload;
+							} else {
+								break;
+							}
+						}
+						response.payload = payload;
 					}
 					response.parts.index = ++partsIndexMultiline;
 					if (response.complete) {
 						response.parts.count = response.parts.index + 1;
 					}
+					if (config.linesFormat === 'csv') {
+						if (partsIndexMultiline > 0) {	//Not for first message
+							response.payload = csvFirstLine + response.payload;
+						}
+						delete response.parts;	//Confusing for the default Node-RED CSV node
+					}
 					downstreamReady = false;
 					node.send(response);
 				}
-				if (tickUpstreamNode && (!upstreamTickSent) && ((fifo.length < nbLinesInChunk) || (fifo.length < 10 * config.nblines))) {
+				if (tickUpstreamNode && (!upstreamTickSent) && ((fifo.length < nbLinesInChunk) || (fifo.length < 10 * config.nbLines))) {
 					//If the FIFO length is low enough, ask upstream to send more data
 					upstreamTickSent = true;
 					tickUpstreamNode.receive({ tick: true });
