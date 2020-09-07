@@ -33,6 +33,8 @@ For instance, when using the n = 1 option, the output of this node can be attach
 * Output <i>n</i> lines at a time:
 	* If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines.
 	* Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.
+* Output format for multiple lines:
+	* If the the above *output* option is higher than one, then choose between providing the lines as a JSON array, or text with multiple lines
 * Text decoding (from binary)
 	* When the input is received as text, this parameter has no effect.
 	* But when the input is received in binary form, this node will have to decode it to text.

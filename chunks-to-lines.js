@@ -72,6 +72,7 @@ module.exports = function (RED) {
 		let upstreamTickSent = false;
 		let upstreamPartsId = '';
 		let partsIndex = -1;
+		let partsIndexMultiline = -1;
 		node.on('input', function (msg) {
 			if (tickDownstreamId === undefined) {
 				tickDownstreamId = findOutputNodeId(node, n => RED.nodes.getNode(n.id).tickProvider);
@@ -107,6 +108,7 @@ module.exports = function (RED) {
 					nbLinesInChunk = 1;
 					upstreamPartsId = '';
 					partsIndex = -1;
+					partsIndexMultiline = -1;
 					downstreamReady = true;
 					fifo.push(msg);	//Inform downstream
 				} else {
@@ -116,6 +118,7 @@ module.exports = function (RED) {
 						byteBuffer = new Int8Array(0);
 						upstreamPartsId = msg.parts.id || '' + Math.random();
 						partsIndex = -1;
+						partsIndexMultiline = -1;
 						downstreamReady = true;
 					}
 
@@ -129,6 +132,7 @@ module.exports = function (RED) {
 							msg.payload += msg.parts.ch;
 						}
 					} else {
+						//TODO: Improve performance. Idea: keep the same buffer
 						let byteBuffer2 = new Int8Array(byteBuffer.length + msg.payload.length);
 						byteBuffer2.set(byteBuffer);
 						byteBuffer2.set(msg.payload, byteBuffer.length);
@@ -190,17 +194,37 @@ module.exports = function (RED) {
 				let response = fifo.shift();
 				if (response) {
 					if (config.nblines > 1) {
-						const payloads = [ response.payload ];
-						for (let i = config.nblines - 2; i >= 0; i--) {
-							const next = fifo.shift();
-							if (next) {
-								response = next;
-								payloads.push(next.payload);
-							} else {
-								break;
+						const partsIndex = response.parts.index;
+						if (config.linesFormat === 'json') {
+							const payloads = [ response.payload ];
+							for (let i = config.nblines - 2; i >= 0; i--) {
+								const next = fifo.shift();
+								if (next) {
+									response = next;
+									payloads.push(next.payload);
+								} else {
+									break;
+								}
 							}
+							response.payload = payloads;
+						} else {	// 'text'
+							let payload = response.payload;
+							for (let i = config.nblines - 2; i >= 0; i--) {
+								const next = fifo.shift();
+								if (next) {
+									response = next;
+									payload += next.payload;
+								} else {
+									break;
+								}
+							}
+							response.payload = payload;
 						}
-						response.payload = payloads;
+						response.parts.index = partsIndex;
+					}
+					response.parts.index = ++partsIndexMultiline;
+					if (response.complete) {
+						response.parts.count = response.parts.index + 1;
 					}
 					downstreamReady = false;
 					node.send(response);

@@ -8,6 +8,13 @@
 		<input type="number" id="node-input-nblines" min="1" max="10000" />
 	</div>
 	<div class="form-row">
+		<label for="node-input-linesformat"><i class="fa fa-flag"></i> Output format for multiple lines</label>
+		<select id="node-input-linesformat">
+			<option value="text">Text</option>
+			<option value="json">JSON array</option>
+		</select>
+	</div>
+	<div class="form-row">
 		<label for="node-input-decoder"><i class="fa fa-flag"></i> Text decoding<br />(from binary)</label>
 		<select id="node-input-decoder">
 			<!--<option value="auto">Automatic (based on BOM)</option>--><!-- TODO -->
@@ -26,6 +33,7 @@
 		defaults: {
 			name: {value: ''},
 			nblines: {value: 1},
+			linesformat: {value: 'text'},
 			decoder: {value: 'UTF-8'},
 		},
 		inputs: 1,
@@ -65,6 +73,9 @@
 		<dt>Output <i>n</i> lines at a time</dt>
 		<dd>If n = 1, outputs one line at a time. If n ≥ 2, outputs an array of lines.</dd>
 		<dd>Larger values are useful for instance to insert many lines at a time in an SQL database and increase performance.</dd>
+
+		<dt>Output format for multiple lines</dt>
+		<dd>If the the above <i>output</i> option is higher than one, then choose between providing the lines as a JSON array, or text with multiple lines.</dd>
 
 		<dt>Text decoding (from binary)</dt>
 		<dd>When the input is received as text, this parameter has no effect.</dd>
