@@ -45,7 +45,7 @@
         "width": 0,
         "height": 5,
         "chunk": "512",
-        "transfer": "binary",
+        "transfer": "text",
         "x": 80,
         "y": 740,
         "wires": [
@@ -84,7 +84,7 @@
         "name": "",
         "nbLines": "20",
         "linesFormat": "csv",
-        "decoder": "UTF-8",
+        "decoder": "Windows-1252",
         "x": 240,
         "y": 740,
         "wires": [
