@@ -68,6 +68,7 @@ module.exports = function (RED) {
 		let downstreamReady = true;
 		let stringBuffer = '';
 		let byteBuffer = new Int8Array(0);
+		let byteBufferEnd = 0;
 		let nbLinesInChunk = 1;
 		let upstreamTickSent = false;
 		let upstreamPartsId = '';
@@ -91,6 +92,7 @@ module.exports = function (RED) {
 					//Upstream abort
 					stringBuffer = '';
 					byteBuffer = new Int8Array(0);
+					byteBufferEnd = 0;
 					msg.payload = '';
 					msg.parts = {
 						id: upstreamPartsId,
@@ -117,7 +119,8 @@ module.exports = function (RED) {
 					if (msg.parts && msg.parts.id && msg.parts.id !== upstreamPartsId) {
 						//Prepare system for a new set of upstream parts
 						stringBuffer = '';
-						byteBuffer = new Int8Array(0);
+						byteBuffer = new Int8Array((msg.payload.length + 1) * 2);
+						byteBufferEnd = 0;
 						upstreamPartsId = msg.parts.id || '' + Math.random();
 						partsIndex = -1;
 						partsIndexMultiline = -1;
@@ -135,12 +138,15 @@ module.exports = function (RED) {
 							msg.payload += msg.parts.ch;
 						}
 					} else {
-						//TODO: Improve performance. Idea: keep the same buffer
-						let byteBuffer2 = new Int8Array(byteBuffer.length + msg.payload.length);
-						byteBuffer2.set(byteBuffer);
-						byteBuffer2.set(msg.payload, byteBuffer.length);
-						byteBuffer = byteBuffer2;
-						byteBuffer2 = undefined;
+						if (byteBuffer.length <= byteBufferEnd + msg.payload.length) {
+							//Auto-increase buffer length
+							let byteBuffer2 = new Int8Array((byteBufferEnd + msg.payload.length + 1) * 2);
+							byteBuffer2.set(byteBuffer);
+							byteBuffer = byteBuffer2;
+							byteBuffer2 = undefined;
+						}
+						byteBuffer.set(msg.payload, byteBufferEnd);
+						byteBufferEnd += msg.payload.length;
 					}
 					msg.payload = '';
 					msg.parts = {
@@ -151,7 +157,8 @@ module.exports = function (RED) {
 					};
 
 					nbLinesInChunk = 0;
-					while (stringBuffer.length > 0 || byteBuffer.length > 0) {
+					let byteBufferStart = 0;
+					while (stringBuffer.length > 0 || byteBufferStart < byteBufferEnd) {
 						const msg2 = RED.util.cloneMessage(msg);
 
 						if (stringBuffer.length > 0) {	//ASCII
@@ -166,14 +173,22 @@ module.exports = function (RED) {
 								break;
 							}
 						} else {	//Binary, fine for ASCII, ISO-8859-X, UTF-8, UTF-16, UTF-32
-							const i = byteBuffer.findIndex((element, index, array) => element === 0x0A);
+							const i = byteBuffer.subarray(byteBufferStart, byteBufferEnd).findIndex((element, index, array) => element === 0x0A);
 							if (i >= 0) {
-								msg2.payload = textDecoder.decode(byteBuffer.slice(0, i + nlOffset));
-								byteBuffer = byteBuffer.slice(i + nlOffset);
+								msg2.payload = textDecoder.decode(byteBuffer.subarray(byteBufferStart, byteBufferStart + i + nlOffset));
+								byteBufferStart += (i + nlOffset);
+								if (byteBufferStart >= byteBufferEnd) {
+									byteBufferStart = 0;
+									byteBufferEnd = 0;
+								}
 							} else if (isLastPacket) {
-								msg2.payload = textDecoder.decode(byteBuffer);
-								byteBuffer = new Int8Array(0);
+								msg2.payload = textDecoder.decode(byteBuffer.subarray(byteBufferStart, byteBufferEnd));
+								byteBufferStart = 0;
+								byteBufferEnd = 0;
 							} else {
+								byteBuffer.copyWithin(0, byteBufferStart, byteBufferEnd);
+								byteBufferEnd -= byteBufferStart;
+								byteBufferStart = 0;
 								break;
 							}
 						}
@@ -184,7 +199,7 @@ module.exports = function (RED) {
 							//First line from upstream
 							csvFirstLine = msg2.payload;
 						}
-						if (isLastPacket && stringBuffer.length === 0 && byteBuffer.length === 0) {
+						if (isLastPacket && stringBuffer.length === 0 && byteBufferStart >= byteBufferEnd) {
 							//Last line from upstream
 							msg2.parts.count = partsIndex + 1;
 							msg2.complete = true;
