@@ -240,6 +240,7 @@ module.exports = function (RED) {
 						}
 						response.payload = payload;
 					}
+					response.parts.lines = response.parts.index + 1;
 					response.parts.index = ++partsIndexMultiline;
 					if (response.complete) {
 						response.parts.count = response.parts.index + 1;
@@ -248,6 +249,7 @@ module.exports = function (RED) {
 						if (partsIndexMultiline > 0) {	//Not for first message
 							response.payload = csvFirstLine + response.payload;
 						}
+						response._parts = response.parts;
 						delete response.parts;	//Confusing for the default Node-RED CSV node
 					}
 					downstreamReady = false;
