@@ -1,4 +1,4 @@
-﻿# node-red-contrib-chunks-to-lines
+# node-red-contrib-chunks-to-lines
 [Node-RED](https://nodered.org) node to read line by line from a stream of chunks of text,
 for instance from a [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload) widget.
 
@@ -31,6 +31,8 @@ Example for CSV processing (splitting a large CSV file as smaller CSV chunks) fo
 inserting many lines at a time to improve performances: [flow-csv.json](doc/flow-csv.json)
 
 ![Node-RED flow](doc/flow-csv.png)
+
+See also a more complete [example of upload of a large CSV file to an SQL database](https://flows.nodered.org/flow/687918dd5cb66a3bfc2a661e15ef4237).
 
 ## Options
 * Output <i>n</i> lines at a time:

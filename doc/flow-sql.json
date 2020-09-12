@@ -1,0 +1,280 @@
+[
+	{
+		"id": "e6ec0f0a.388198",
+		"type": "chunks-to-lines",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"nbLines": "4096",
+		"linesFormat": "csv",
+		"decoder": "UTF-8",
+		"x": 280,
+		"y": 940,
+		"wires": [
+			[
+				"436dce51.065f6"
+			]
+		]
+	},
+	{
+		"id": "14ab9391.1e1434",
+		"type": "postgres",
+		"z": "d9a661f4.ef966",
+		"postgresdb": "530bf591.f48c14",
+		"name": "",
+		"output": true,
+		"perrow": false,
+		"rowspermsg": "1",
+		"outputs": 1,
+		"x": 720,
+		"y": 940,
+		"wires": [
+			[
+				"a2a16dc6.fbd32"
+			]
+		]
+	},
+	{
+		"id": "a2a16dc6.fbd32",
+		"type": "function",
+		"z": "d9a661f4.ef966",
+		"name": "Ready for next lines",
+		"func": "return [\n    msg.complete ? msg : null,\n    { tick: true },\n];\n",
+		"outputs": 2,
+		"noerr": 0,
+		"initialize": "",
+		"finalize": "",
+		"x": 920,
+		"y": 880,
+		"wires": [
+			[
+				"96f229aa.947158",
+				"87fbc09b.6deeb"
+			],
+			[
+				"e6ec0f0a.388198"
+			]
+		]
+	},
+	{
+		"id": "436dce51.065f6",
+		"type": "csv",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"sep": ",",
+		"hdrin": true,
+		"hdrout": "none",
+		"multi": "mult",
+		"ret": "\\n",
+		"temp": "",
+		"skip": "0",
+		"strings": false,
+		"include_empty_strings": "",
+		"include_null_values": "",
+		"x": 430,
+		"y": 940,
+		"wires": [
+			[
+				"4127dd44.2d49d4"
+			]
+		]
+	},
+	{
+		"id": "4127dd44.2d49d4",
+		"type": "function",
+		"z": "d9a661f4.ef966",
+		"name": "Format SQL",
+		"func": "if (msg.payload && msg.payload.length > 0) {\n    let payload = 'INSERT INTO your_table(time, sensor, data) VALUES ';\n    \n    for (const line of msg.payload) {\n        payload += `('${line.time}', '${line.sensor}', '${line.data}'),`;\n    }\n    \n    msg.payload = payload.slice(0, - 1) + ';';\n}\nreturn msg;\n",
+		"outputs": 1,
+		"noerr": 0,
+		"initialize": "",
+		"finalize": "",
+		"x": 570,
+		"y": 940,
+		"wires": [
+			[
+				"14ab9391.1e1434"
+			]
+		]
+	},
+	{
+		"id": "d5504079.651a68",
+		"type": "comment",
+		"z": "d9a661f4.ef966",
+		"name": "Upload to SQL",
+		"info": "",
+		"x": 120,
+		"y": 780,
+		"wires": []
+	},
+	{
+		"id": "3eddd94d.86d406",
+		"type": "template",
+		"z": "d9a661f4.ef966",
+		"name": "Create SQL table",
+		"field": "payload",
+		"fieldType": "msg",
+		"format": "text",
+		"syntax": "plain",
+		"template": "DROP TABLE IF EXISTS your_table;\nCREATE TABLE your_table (\n\ttime\tTIMESTAMP WITH TIME ZONE\tNOT NULL,\n\tsensor\tTEXT,\n\tdata\tJSONB\n);\n\nSELECT create_hypertable('your_table', 'time');\n",
+		"output": "str",
+		"x": 330,
+		"y": 840,
+		"wires": [
+			[
+				"abbb6389.c165f"
+			]
+		]
+	},
+	{
+		"id": "abbb6389.c165f",
+		"type": "postgres",
+		"z": "d9a661f4.ef966",
+		"postgresdb": "4282fb00.235e7c",
+		"name": "",
+		"output": true,
+		"perrow": false,
+		"rowspermsg": "1",
+		"outputs": 1,
+		"x": 500,
+		"y": 840,
+		"wires": [
+			[
+				"715380a8.42ec7"
+			]
+		]
+	},
+	{
+		"id": "715380a8.42ec7",
+		"type": "debug",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": false,
+		"complete": "true",
+		"targetType": "full",
+		"statusVal": "",
+		"statusType": "auto",
+		"x": 630,
+		"y": 840,
+		"wires": []
+	},
+	{
+		"id": "65d2e9d6.5ca5",
+		"type": "ui_button",
+		"z": "d9a661f4.ef966",
+		"name": "",
+		"group": "9a057908.25fdc8",
+		"order": 1,
+		"width": 0,
+		"height": 0,
+		"passthru": false,
+		"label": "Prepare SQL table",
+		"tooltip": "",
+		"color": "",
+		"bgcolor": "",
+		"icon": "",
+		"payload": "",
+		"payloadType": "str",
+		"topic": "",
+		"x": 130,
+		"y": 840,
+		"wires": [
+			[
+				"3eddd94d.86d406"
+			]
+		]
+	},
+	{
+		"id": "96f229aa.947158",
+		"type": "ui_text",
+		"z": "d9a661f4.ef966",
+		"group": "9a057908.25fdc8",
+		"order": 4,
+		"width": 0,
+		"height": 0,
+		"name": "",
+		"label": "Lines uploaded:",
+		"format": "{{msg._parts.lines}}",
+		"layout": "row-spread",
+		"x": 1180,
+		"y": 900,
+		"wires": []
+	},
+	{
+		"id": "87fbc09b.6deeb",
+		"type": "debug",
+		"z": "d9a661f4.ef966",
+		"name": "Done",
+		"active": true,
+		"tosidebar": true,
+		"console": false,
+		"tostatus": true,
+		"complete": "true",
+		"targetType": "full",
+		"statusVal": "_parts.lines",
+		"statusType": "msg",
+		"x": 1150,
+		"y": 940,
+		"wires": []
+	},
+	{
+		"id": "4b31cec2.dad2c8",
+		"type": "ui_upload",
+		"z": "d9a661f4.ef966",
+		"group": "9a057908.25fdc8",
+		"title": "Upload to SQL",
+		"name": "uploadSql",
+		"order": 3,
+		"width": 6,
+		"height": 6,
+		"chunk": "256",
+		"transfer": "binary",
+		"x": 100,
+		"y": 940,
+		"wires": [
+			[
+				"e6ec0f0a.388198"
+			]
+		]
+	},
+	{
+		"id": "530bf591.f48c14",
+		"type": "postgresdb",
+		"z": "",
+		"hostname": "timescale",
+		"port": "5432",
+		"db": "iot",
+		"ssl": false
+	},
+	{
+		"id": "4282fb00.235e7c",
+		"type": "postgresdb",
+		"z": "",
+		"hostname": "timescale",
+		"port": "5432",
+		"db": "iot",
+		"ssl": false
+	},
+	{
+		"id": "9a057908.25fdc8",
+		"type": "ui_group",
+		"z": "",
+		"name": "Default",
+		"tab": "346b17cb.d35ae8",
+		"order": 1,
+		"disp": true,
+		"width": "6",
+		"collapse": false
+	},
+	{
+		"id": "346b17cb.d35ae8",
+		"type": "ui_tab",
+		"z": "",
+		"name": "DemoUploadSQL",
+		"icon": "dashboard",
+		"disabled": false,
+		"hidden": false
+	}
+]
