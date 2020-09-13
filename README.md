@@ -51,7 +51,7 @@ See also a more complete [example of upload of a large CSV file to an SQL databa
 
 ## Backpressure
 This node supports *backpressure* / *flow control*:
-it can wait for a *tick* before uploading the next chunk of data, to make sure the rest of your Node-RED flow is ready to process more data
+it can wait for a *tick* before releasing the next batch of lines, to make sure the rest of your Node-RED flow is ready to process more data
 (instead of risking an out-of-memory condition), and also conveys this information upstream.
 
 So this node will only output one message at first, and then await a message containing a truthy `msg.tick` before releasing the next message.
@@ -62,7 +62,7 @@ and a truthy `node.tickProvider` for upstream nodes.
 Likewise, this node detects upstream nodes using the same back-pressure convention, and automatically sends ticks when its internal buffer is getting low, to ask for the next chunk of data.
 This is done for instance with the [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload) widget.
 
-As a side node, several instances of this node can be chained to test this mechanism.
+As a side note, several instances of this node can be chained to test this mechanism.
 
 ## Credits
 License: [Apache 2.0](LICENSE.md), 2020.
