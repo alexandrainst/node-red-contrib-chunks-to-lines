@@ -30,12 +30,12 @@ This node will output either one line at a time (when n=1 in corresponding optio
 
 The messages will contain updated sequence information in `msg.parts` and `msg.complete`.
 
-Example for CSV processing (splitting a large CSV file as smaller CSV chunks) for mass insertion into a [PostgreSQL](https://flows.nodered.org/node/node-red-contrib-postgresql) database,
-inserting many lines at a time to improve performances: [flow-csv.json](doc/flow-csv.json)
+Example for CSV processing (splitting a large CSV file as smaller CSV chunks) for mass insertion into a [PostgreSQL](https://www.npmjs.com/package/node-red-contrib-postgresql) database,
+inserting many lines at a time to improve performances: [flow-sql.json](doc/flow-sql.json)
 
-![Node-RED flow](doc/flow-csv.png)
+![Node-RED flow](doc/flow-sql.png)
 
-See also a more complete [example of upload of a large CSV file to an SQL database](https://flows.nodered.org/flow/687918dd5cb66a3bfc2a661e15ef4237).
+See the full description of the [example of upload of a large CSV file to an SQL database](https://flows.nodered.org/flow/687918dd5cb66a3bfc2a661e15ef4237).
 
 ## Options
 
