@@ -5,6 +5,7 @@
 	"readmeFilename": "readme.md",
 	"keywords": [
 		"chunks",
+		"backpressure",
 		"text",
 		"reader",
 		"lines",
