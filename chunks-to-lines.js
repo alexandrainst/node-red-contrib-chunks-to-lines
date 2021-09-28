@@ -24,26 +24,6 @@ function findInputNodeId(toNode, filter = null) {
 	return false;
 }
 
-/**
- * Return an outgoing node ID if the node has any output wired to it, false otherwise.
- * If filter callback is not null, then this function filters outgoing nodes.
- */
-function findOutputNodeId(fromNode, filter = null) {
-	if (fromNode && fromNode.wires && fromNode._flow && fromNode._flow.global) {
-		const allNodes = fromNode._flow.global.allNodes;
-		for (const wireId of Object.keys(fromNode.wires)) {
-			const wire = fromNode.wires[wireId];
-			for (const toNodeId of wire) {
-				const toNode = allNodes[toNodeId];
-				if (!filter || filter(toNode)) {
-					return toNode.id;
-				}
-			}
-		}
-	}
-	return false;
-}
-
 module.exports = function (RED) {
 	const util = require('util');
 
@@ -58,7 +38,6 @@ module.exports = function (RED) {
 
 		//Declare the ability of this node to consume ticks from downstream for back-pressure
 		node.tickConsumer = true;
-		let tickDownstreamId;
 
 		const textDecoder = new util.TextDecoder(config.decoder || 'UTF-8');
 		//Special case for multi-byte new line in little-endian
@@ -76,9 +55,6 @@ module.exports = function (RED) {
 		let partsIndexMultiline = -1;
 		let csvFirstLine = '';
 		node.on('input', function (msg) {
-			if (tickDownstreamId === undefined) {
-				tickDownstreamId = findOutputNodeId(node, n => RED.nodes.getNode(n.id).tickProvider);
-			}
 			if (tickUpstreamId === undefined) {
 				tickUpstreamId = findInputNodeId(node, n => RED.nodes.getNode(n.id).tickConsumer);
 				tickUpstreamNode = tickUpstreamId ? RED.nodes.getNode(tickUpstreamId) : null;
