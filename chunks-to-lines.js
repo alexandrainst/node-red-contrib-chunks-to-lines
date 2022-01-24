@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Return an incoming node ID if the node has any input wired to it, false otherwise.
@@ -31,16 +31,16 @@ module.exports = function (RED) {
 		const node = this;	// jshint ignore:line
 		RED.nodes.createNode(node, config);
 
-		//Declare the ability of this node to provide ticks upstream for back-pressure
+		// Declare the ability of this node to provide ticks upstream for back-pressure
 		node.tickProvider = true;
 		let tickUpstreamId;
 		let tickUpstreamNode;
 
-		//Declare the ability of this node to consume ticks from downstream for back-pressure
+		// Declare the ability of this node to consume ticks from downstream for back-pressure
 		node.tickConsumer = true;
 
 		const textDecoder = new util.TextDecoder(config.decoder || 'UTF-8');
-		//Special case for multi-byte new line in little-endian
+		// Special case for multi-byte new line in little-endian
 		const nlOffset = textDecoder.encoding === 'utf-16le' ? 2 : 1;
 
 		const fifo = [];
@@ -65,7 +65,7 @@ module.exports = function (RED) {
 			} else if (typeof msg.payload === 'string' || ArrayBuffer.isView(msg.payload)) {
 				upstreamTickSent = false;
 				if (msg.parts && msg.parts.abort) {
-					//Upstream abort
+					// Upstream abort
 					stringBuffer = '';
 					byteBuffer = new Int8Array(0);
 					byteBufferEnd = 0;
@@ -80,7 +80,7 @@ module.exports = function (RED) {
 					};
 
 					while (fifo.length > 0 && fifo[fifo.length - 1].parts.id === upstreamPartsId) {
-						//Clear parts from the former sequence in our FIFO
+						// Clear parts from the former sequence in our FIFO
 						fifo.pop();
 					}
 
@@ -90,10 +90,10 @@ module.exports = function (RED) {
 					partsIndexMultiline = -1;
 					csvFirstLine = '';
 					downstreamReady = true;
-					fifo.push(msg);	//Inform downstream
+					fifo.push(msg);	// Inform downstream
 				} else {
 					if (msg.parts && msg.parts.id && msg.parts.id !== upstreamPartsId) {
-						//Prepare system for a new set of upstream parts
+						// Prepare system for a new set of upstream parts
 						stringBuffer = '';
 						byteBuffer = new Int8Array((msg.payload.length + 1) * 2);
 						byteBufferEnd = 0;
@@ -104,8 +104,8 @@ module.exports = function (RED) {
 						downstreamReady = true;
 					}
 
-					const isLastPacket = msg.complete || (msg.parts && msg.parts.hasOwnProperty('count') &&
-						msg.parts.hasOwnProperty('index') && msg.parts.index > msg.parts.count);
+					const isLastPacket = msg.complete || (msg.parts && Object.prototype.hasOwnProperty.call(msg.parts, 'count') &&
+						Object.prototype.hasOwnProperty.call(msg.parts, 'index') && msg.parts.index > msg.parts.count);
 					delete msg.complete;
 
 					if (typeof msg.payload === 'string') {
@@ -115,7 +115,7 @@ module.exports = function (RED) {
 						}
 					} else {
 						if (byteBuffer.length <= byteBufferEnd + msg.payload.length) {
-							//Auto-increase buffer length
+							// Auto-increase buffer length
 							let byteBuffer2 = new Int8Array((byteBufferEnd + msg.payload.length + 1) * 2);
 							byteBuffer2.set(byteBuffer);
 							byteBuffer = byteBuffer2;
@@ -137,8 +137,8 @@ module.exports = function (RED) {
 					while (stringBuffer.length > 0 || byteBufferStart < byteBufferEnd) {
 						const msg2 = RED.util.cloneMessage(msg);
 
-						if (stringBuffer.length > 0) {	//ASCII
-							const i = stringBuffer.indexOf("\n");
+						if (stringBuffer.length > 0) {	// ASCII
+							const i = stringBuffer.indexOf('\n');
 							if (i >= 0) {
 								msg2.payload = stringBuffer.substring(0, i + 1);
 								stringBuffer = stringBuffer.substring(i + 1);
@@ -148,7 +148,7 @@ module.exports = function (RED) {
 							} else {
 								break;
 							}
-						} else {	//Binary, fine for ASCII, ISO-8859-X, UTF-8, UTF-16, UTF-32
+						} else {	// Binary, fine for ASCII, ISO-8859-X, UTF-8, UTF-16, UTF-32
 							const i = byteBuffer.subarray(byteBufferStart, byteBufferEnd).findIndex((element, index, array) => element === 0x0A);
 							if (i >= 0) {
 								msg2.payload = textDecoder.decode(byteBuffer.subarray(byteBufferStart, byteBufferStart + i + nlOffset));
@@ -172,11 +172,11 @@ module.exports = function (RED) {
 						nbLinesInChunk++;
 						msg2.parts.index = ++partsIndex;
 						if (partsIndex === 0) {
-							//First line from upstream
+							// First line from upstream
 							csvFirstLine = msg2.payload;
 						}
 						if (isLastPacket && stringBuffer.length === 0 && byteBufferStart >= byteBufferEnd) {
-							//Last line from upstream
+							// Last line from upstream
 							msg2.parts.count = partsIndex + 1;
 							msg2.complete = true;
 						}
@@ -184,7 +184,7 @@ module.exports = function (RED) {
 					}
 				}
 			} else {
-				//Forward unknown type of message
+				// Forward unknown type of message
 				node.send(msg);
 			}
 
@@ -192,7 +192,7 @@ module.exports = function (RED) {
 				let response = fifo.shift();
 				if (response) {
 					if (config.linesFormat === 'json') {
-						const payloads = [ response.payload ];
+						const payloads = [response.payload];
 						for (let i = config.nbLines - 2; i >= 0; i--) {
 							const next = fifo.shift();
 							if (next) {
@@ -222,17 +222,17 @@ module.exports = function (RED) {
 						response.parts.count = response.parts.index + 1;
 					}
 					if (config.linesFormat === 'csv') {
-						if (partsIndexMultiline > 0) {	//Not for first message
+						if (partsIndexMultiline > 0) {	// Not for first message
 							response.payload = csvFirstLine + response.payload;
 						}
 						response._parts = response.parts;
-						delete response.parts;	//Confusing for the default Node-RED CSV node
+						delete response.parts;	// Confusing for the default Node-RED CSV node
 					}
 					downstreamReady = false;
 					node.send(response);
 				}
 				if (tickUpstreamNode && (!upstreamTickSent) && ((fifo.length < nbLinesInChunk) || (fifo.length < 10 * config.nbLines))) {
-					//If the FIFO length is low enough, ask upstream to send more data
+					// If the FIFO length is low enough, ask upstream to send more data
 					upstreamTickSent = true;
 					tickUpstreamNode.receive({ tick: true });
 				}
