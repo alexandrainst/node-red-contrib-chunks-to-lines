@@ -28,14 +28,15 @@
 </script>
 
 <script>
+	/* global RED:false */
 	RED.nodes.registerType('chunks-to-lines', {
 		category: 'sequence',
 		color: '#E2D96E',
 		defaults: {
-			name: {value: ''},
-			nbLines: {value: 1},
-			linesFormat: {value: 'text'},
-			decoder: {value: 'UTF-8'},
+			name: { value: '' },
+			nbLines: { value: 1 },
+			linesFormat: { value: 'text' },
+			decoder: { value: 'UTF-8' },
 		},
 		inputs: 1,
 		outputs: 1,
@@ -47,8 +48,8 @@
 		labelStyle: function () {
 			return this.name ? 'node_label_italic' : '';
 		},
-		oneditprepare: function() {
-		}
+		oneditprepare: function () {
+		},
 	});
 </script>
 
