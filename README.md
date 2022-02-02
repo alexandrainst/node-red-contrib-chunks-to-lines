@@ -69,6 +69,19 @@ This is done for instance with the [node-red-contrib-ui-upload](https://github.c
 
 As a side note, several instances of this node can be chained to test this mechanism.
 
+### Piping on command line
+
+This node can also be used from the command line:
+
+```sh
+printf '{"payload":"A;B;C\\n1;2;3\\n4;5;6\\n7;8;9\\n10;11;12\\n"} \n {"tick": true} \n {"tick": true} \n' | \
+  node ./index.js chunks-to-lines --linesFormat='"csv"' --nbLines='2'
+```
+
+*Note*: This is used for [our automated test](test.sh).
+
+The CLI functionnality is provided by [*node-red-contrib-mock-cli*](https://github.com/alexandrainst/node-red-contrib-mock-cli).
+
 ## Credits
 
 License: [Apache 2.0](LICENSE.md), 2020-2021.
