@@ -10,9 +10,9 @@ There is indeed a built-in back-pressure / flow-control mechanism to optimise bu
 This node is compatible with the conventions used by core nodes such as *split* and *join* to [work with sequences](https://nodered.org/docs/user-guide/messages#message-sequences").
 For instance, this node can consume data coming from a [node-red-contrib-ui-upload](https://github.com/alexandrainst/node-red-contrib-ui-upload).
 
-Example: [flow.json](doc/flow.json)
+Example: [flow.json](examples/flow.json)
 
-![Node-RED flow](doc/flow.png)
+![Node-RED flow](examples/flow.png)
 
 ## Input
 
@@ -31,9 +31,9 @@ This node will output either one line at a time (when n=1 in corresponding optio
 The messages will contain updated sequence information in `msg.parts` and `msg.complete`.
 
 Example for CSV processing (splitting a large CSV file as smaller CSV chunks) for mass insertion into a [PostgreSQL](https://www.npmjs.com/package/node-red-contrib-postgresql) database,
-inserting many lines at a time to improve performances: [flow-sql.json](doc/flow-sql.json)
+inserting many lines at a time to improve performances: [flow-sql.json](examples/flow-sql.json)
 
-![Node-RED flow](doc/flow-sql.png)
+![Node-RED flow](examples/flow-sql.png)
 
 See the full description of the [example of upload of a large CSV file to an SQL database](https://flows.nodered.org/flow/687918dd5cb66a3bfc2a661e15ef4237).
 
