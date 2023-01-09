@@ -56,7 +56,7 @@ module.exports = function (RED) {
 		let csvFirstLine = '';
 		node.on('input', function (msg) {
 			if (tickUpstreamId === undefined) {
-				tickUpstreamId = findInputNodeId(node, n => RED.nodes.getNode(n.id).tickConsumer);
+				tickUpstreamId = findInputNodeId(node, (n) => n && n.tickConsumer);
 				tickUpstreamNode = tickUpstreamId ? RED.nodes.getNode(tickUpstreamId) : null;
 			}
 
