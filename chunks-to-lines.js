@@ -179,6 +179,9 @@ module.exports = function (RED) {
 							// Last line from upstream
 							msg2.parts.count = partsIndex + 1;
 							msg2.complete = true;
+							// Ensure a new sequence will be started for the next set of upstream parts
+							upstreamPartsId = '' + Math.random();
+							partsIndex = -1;
 						}
 						fifo.push(msg2);
 					}
@@ -230,6 +233,11 @@ module.exports = function (RED) {
 					}
 					downstreamReady = false;
 					node.send(response);
+					if (response.complete) {
+						// Cleaning while waiting for a new set of upstream parts
+						partsIndexMultiline = -1;
+						csvFirstLine = '';
+					}
 				}
 				if (tickUpstreamNode && (!upstreamTickSent) && ((fifo.length < nbLinesInChunk) || (fifo.length < 10 * config.nbLines))) {
 					// If the FIFO length is low enough, ask upstream to send more data

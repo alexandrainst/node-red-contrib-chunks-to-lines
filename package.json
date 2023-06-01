@@ -1,6 +1,6 @@
 {
 	"name": "node-red-contrib-chunks-to-lines",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"description": "Node-RED node to read line by line from chunks of text",
 	"readmeFilename": "readme.md",
 	"keywords": [
