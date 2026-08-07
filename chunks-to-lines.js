@@ -116,10 +116,9 @@ module.exports = function (RED) {
 					} else {
 						if (byteBuffer.length <= byteBufferEnd + msg.payload.length) {
 							// Auto-increase buffer length
-							let byteBuffer2 = new Int8Array((byteBufferEnd + msg.payload.length + 1) * 2);
+							const byteBuffer2 = new Int8Array((byteBufferEnd + msg.payload.length + 1) * 2);
 							byteBuffer2.set(byteBuffer);
 							byteBuffer = byteBuffer2;
-							byteBuffer2 = undefined;
 						}
 						byteBuffer.set(msg.payload, byteBufferEnd);
 						byteBufferEnd += msg.payload.length;
@@ -164,7 +163,6 @@ module.exports = function (RED) {
 							} else {
 								byteBuffer.copyWithin(0, byteBufferStart, byteBufferEnd);
 								byteBufferEnd -= byteBufferStart;
-								byteBufferStart = 0;
 								break;
 							}
 						}
