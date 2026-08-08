@@ -36,24 +36,26 @@
 		"type": "git",
 		"url": "git+https://github.com/alexandrainst/node-red-contrib-chunks-to-lines.git"
 	},
+	"dependencies": {
+		"node-red-contrib-mock-cli": "^1.5.0"
+	},
 	"devDependencies": {
 		"eslint": "^10.8.0",
 		"@eslint/js": "^10.0.1",
 		"eslint-plugin-html": "^8.1.4",
 		"globals": "^17.9.0",
 		"markdownlint-cli2": "^0.23.2",
-		"neostandard": "^0.14.0-next",
-		"node-red-contrib-mock-cli": "^1.4.4"
+		"neostandard": "^0.14.0-next"
 	},
 	"scripts": {
 		"eslint": "eslint .",
 		"eslint_fix": "eslint --fix .",
 		"markdownlint": "markdownlint-cli2",
 		"markdownlint_fix": "markdownlint-cli2 --fix",
-		"fix": "npm run rtlcss && npm run eslint_fix && npm run markdownlint_fix",
+		"fix": "npm run eslint_fix && npm run markdownlint_fix",
 		"pretest": "npm run eslint && npm run markdownlint",
 		"start": "node ./index.js",
 		"test:only": "./test.sh",
-		"test": "./test.sh"
+		"test": "npm run test:only"
 	}
 }
